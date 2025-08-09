@@ -1493,7 +1493,6 @@
 
       function setupEventListeners() {
           const messageInput = document.getElementById('messageInput');
-
           // Auto-resize textarea
           messageInput.addEventListener('input', function() {
               this.style.height = 'auto';
@@ -1510,7 +1509,6 @@
           document.addEventListener('click', function(e) {
               const sidebar = document.getElementById('sidebar');
               const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-
               if (window.innerWidth <= 768 &&
                   !sidebar.contains(e.target) &&
                   !mobileMenuBtn.contains(e.target) &&
@@ -1537,7 +1535,6 @@
               messageCount = parseInt(storedMessageCount);
               document.getElementById('messageCount').textContent = messageCount;
           }
-
           if (storedSessionCount) {
               sessionCount = parseInt(storedSessionCount);
               document.getElementById('sessionCount').textContent = sessionCount;
@@ -1561,7 +1558,6 @@
       function createNewSession() {
           currentSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
           currentMessages = [];
-
           const newSession = {
               id: currentSessionId,
               title: 'New Conversation',
@@ -1570,7 +1566,6 @@
               updatedAt: new Date().toISOString(),
               messageCount: 0
           };
-
           chatHistory.unshift(newSession);
           sessionCount++;
           document.getElementById('sessionCount').textContent = sessionCount;
@@ -1584,7 +1579,6 @@
               chatHistory[sessionIndex].messages = [...currentMessages];
               chatHistory[sessionIndex].updatedAt = new Date().toISOString();
               chatHistory[sessionIndex].messageCount = currentMessages.length;
-
               // Update title based on first user message
               if (currentMessages.length > 0) {
                   const firstUserMessage = currentMessages.find(msg => msg.role === 'user');
@@ -1593,7 +1587,6 @@
                       chatHistory[sessionIndex].title = title.length < firstUserMessage.content.length ? title + '...' : title;
                   }
               }
-
               saveData();
               updateHistoryDisplay();
           }
@@ -1604,11 +1597,9 @@
           if (session) {
               currentSessionId = sessionId;
               currentMessages = [...session.messages];
-
               // Clear current chat and load session messages
               const chatMessages = document.getElementById('chatMessages');
               chatMessages.innerHTML = '';
-
               currentMessages.forEach(message => {
                   // Check if message has image data
                   if (message.chart_image) {
@@ -1617,7 +1608,6 @@
                       appendMessage(message.role, message.content, false, false);
                   }
               });
-
               // Mark session as active in history
               updateHistoryDisplay();
               closeHistoryPanel();
@@ -1634,12 +1624,10 @@
               saveData();
               updateHistoryDisplay();
               updateHistoryBadge();
-
               // If deleted session was current, create new one
               if (sessionId === currentSessionId) {
                   newChat();
               }
-
               showNotification('Session deleted', 'success');
           }
       }
@@ -1655,7 +1643,6 @@
                   chatHistory.splice(emptySessionIndex, 1);
               }
           }
-
           // Clear current chat
           const chatMessages = document.getElementById('chatMessages');
           chatMessages.innerHTML = `
@@ -1685,7 +1672,6 @@
                   </div>
               </div>
           `;
-
           createNewSession();
           showWelcomeMessage();
           showNotification('New chat started', 'success');
@@ -1695,24 +1681,20 @@
       function openHistoryPanel() {
           const historyPanel = document.getElementById('historyPanel');
           const historyOverlay = document.getElementById('historyOverlay');
-
           historyPanel.classList.add('open');
           historyOverlay.classList.add('active');
-
           updateHistoryDisplay();
       }
 
       function closeHistoryPanel() {
           const historyPanel = document.getElementById('historyPanel');
           const historyOverlay = document.getElementById('historyOverlay');
-
           historyPanel.classList.remove('open');
           historyOverlay.classList.remove('active');
       }
 
       function updateHistoryDisplay() {
           const historyContent = document.getElementById('historyContent');
-
           if (chatHistory.length === 0) {
               historyContent.innerHTML = `
                   <div class="history-empty">
@@ -1725,18 +1707,14 @@
           }
           // Group sessions by date
           const groupedSessions = groupSessionsByDate(chatHistory);
-
           let historyHTML = '';
-
           Object.keys(groupedSessions).forEach(dateGroup => {
               historyHTML += `<div class="history-section">`;
               historyHTML += `<div class="history-section-title">${dateGroup}</div>`;
-
               groupedSessions[dateGroup].forEach(session => {
                   const isActive = session.id === currentSessionId;
                   const timeAgo = getTimeAgo(new Date(session.updatedAt));
                   const preview = getSessionPreview(session);
-
                   historyHTML += `
                       <div class="history-item ${isActive ? 'active' : ''}" onclick="loadSession('${session.id}')">
                           <div class="history-item-header">
@@ -1761,10 +1739,8 @@
                       </div>
                   `;
               });
-
               historyHTML += `</div>`;
           });
-
           historyContent.innerHTML = historyHTML;
       }
 
@@ -1777,7 +1753,6 @@
           sessions.forEach(session => {
               const sessionDate = new Date(session.updatedAt);
               let groupKey;
-
               if (isSameDay(sessionDate, today)) {
                   groupKey = 'Today';
               } else if (isSameDay(sessionDate, yesterday)) {
@@ -1795,7 +1770,6 @@
               }
               groups[groupKey].push(session);
           });
-
           return groups;
       }
 
@@ -1813,20 +1787,17 @@
           if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
           if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
           if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-
           return date.toLocaleDateString();
       }
 
       function getSessionPreview(session) {
           if (session.messages.length === 0) return 'No messages yet';
           const lastMessage = session.messages[session.messages.length - 1];
-
           // If the last message was an image, use its content (description) for preview
           if (lastMessage.chart_image) {
               const description = lastMessage.content || ''; // Ensure content is a string
               return `Visualization: ${description.substring(0, 50)}${description.length > 50 ? '...' : ''}`;
           }
-
           // For regular messages, use their content
           const content = lastMessage.content || ''; // Ensure content is a string
           const preview = content.replace(/\*\*(.*?)\*\*/g, '$1').substring(0, 100);
@@ -1835,7 +1806,6 @@
 
       function searchHistory() {
           const searchTerm = document.getElementById('historySearch').value.toLowerCase();
-
           if (!searchTerm) {
               updateHistoryDisplay();
               return;
@@ -1847,7 +1817,6 @@
           });
 
           const historyContent = document.getElementById('historyContent');
-
           if (filteredHistory.length === 0) {
               historyContent.innerHTML = `
                   <div class="history-empty">
@@ -1860,12 +1829,10 @@
           }
 
           let historyHTML = '<div class="history-section"><div class="history-section-title">Search Results</div>';
-
           filteredHistory.forEach(session => {
               const isActive = session.id === currentSessionId;
               const timeAgo = getTimeAgo(new Date(session.updatedAt));
               const preview = getSessionPreview(session);
-
               historyHTML += `
                   <div class="history-item ${isActive ? 'active' : ''}" onclick="loadSession('${session.id}')">
                       <div class="history-item-header">
@@ -1890,7 +1857,6 @@
                   </div>
               `;
           });
-
           historyHTML += '</div>';
           historyContent.innerHTML = historyHTML;
       }
@@ -1934,7 +1900,6 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-
           showNotification('Session exported successfully!', 'success');
       }
 
@@ -1967,7 +1932,6 @@
                       exportText += `[${messageIndex + 1}] ${role}:\n${message.content}\n\n`;
                   }
               });
-
               exportText += '='.repeat(80) + '\n\n';
           });
 
@@ -1980,7 +1944,6 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-
           showNotification('Complete history exported successfully!', 'success');
       }
 
@@ -1989,7 +1952,6 @@
               showNotification('No history to clear', 'error');
               return;
           }
-
           if (confirm('Are you sure you want to delete all chat history? This action cannot be undone.')) {
               chatHistory = [];
               sessionCount = 0;
@@ -1997,10 +1959,8 @@
               saveData();
               updateHistoryDisplay();
               updateHistoryBadge();
-
               // Create new session
               newChat();
-
               showNotification('All history cleared successfully', 'success');
           }
       }
@@ -2019,7 +1979,6 @@
       function toggleSidebar() {
           const sidebar = document.getElementById('sidebar');
           const overlay = document.getElementById('sidebarOverlay');
-
           sidebar.classList.toggle('open');
           overlay.classList.toggle('active');
       }
@@ -2027,7 +1986,6 @@
       function closeSidebar() {
           const sidebar = document.getElementById('sidebar');
           const overlay = document.getElementById('sidebarOverlay');
-
           sidebar.classList.remove('open');
           overlay.classList.remove('active');
       }
@@ -2037,14 +1995,11 @@
           document.querySelectorAll('.menu-item').forEach(item => {
               item.classList.remove('active');
           });
-
           // Add active class to clicked item
           element.classList.add('active');
           currentActiveMenu = menuType;
-
           // Handle different menu actions
           handleMenuAction(menuType);
-
           // Close sidebar on mobile after selection
           if (window.innerWidth <= 768) {
               closeSidebar();
@@ -2079,12 +2034,12 @@
       // Message functions
       function appendMessage(role, content, isLoading = false, saveToHistory = true) {
           const chatMessages = document.getElementById('chatMessages');
-
           // Remove welcome message if it exists
           const welcomeMessage = chatMessages.querySelector('.welcome-message');
           if (welcomeMessage) {
               welcomeMessage.remove();
           }
+
           const messageDiv = document.createElement('div');
           messageDiv.className = `message ${role}`;
 
@@ -2106,6 +2061,7 @@
           } else {
               messageContent = formatContent(content);
           }
+
           messageDiv.innerHTML = `
               <div class="message-content">
                   <div class="${avatarClass}">
@@ -2127,7 +2083,6 @@
               currentMessages.push(messageObj);
               updateCurrentSession();
           }
-
           return messageDiv;
       }
 
@@ -2177,19 +2132,15 @@
           }
       }
 
-
       function formatContent(content) {
           // Convert **bold** to <strong>
           let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
           // Convert markdown tables to HTML
           if (/\|(.+)\|/.test(formatted)) {
               formatted = convertMarkdownTableToHTML(formatted);
           }
-
           // Convert line breaks
           formatted = formatted.replace(/\n/g, '<br>');
-
           return formatted;
       }
 
@@ -2211,7 +2162,6 @@
               html += '<tr>' + row.map(cell => `<td>${cell || ''}</td>`).join('') + '</tr>';
           });
           html += '</tbody></table>';
-
           return html;
       }
 
@@ -2219,6 +2169,26 @@
           const chatMessages = document.getElementById('chatMessages');
           chatMessages.scrollTop = chatMessages.scrollHeight;
       }
+
+      function lastNByRole(messages, nUser = 3, nAssistant = 3) {
+        const users = [];
+        const bots  = [];
+        for (let i = messages.length - 1; i >= 0 && (users.length < nUser || bots.length < nAssistant); i--) {
+            const m = messages[i];
+            if (m.role === 'user' && users.length < nUser) users.push(i);
+            if (m.role !== 'user' && bots.length < nAssistant) bots.push(i);
+        }
+        const selectedIndexes = [...users, ...bots].sort((a, b) => a - b);
+        return selectedIndexes.map(i => {
+            const m = messages[i];
+            return {
+                role: m.role, // keep "user" / "bot" to match your backend
+                content: m.chart_image ? `(Visualization: ${m.content || ''})` : (m.content || '')
+            };
+        });
+    }
+
+
 
       async function sendMessage() {
           const input = document.getElementById('messageInput');
@@ -2257,6 +2227,16 @@
 
           const loadingMessage = appendMessage('bot', '', true, false);
 
+          // Prepare conversation history for the LLM
+          // Get the last 6 messages (3 user, 3 assistant)
+          // Prepare conversation history for the LLM: last 3 user + last 3 assistant
+          const conversationHistoryForLLM = lastNByRole(currentMessages, 3, 3);
+          console.log("Conversation history for LLM:", conversationHistoryForLLM);
+          console.log("As JSON:", JSON.stringify(conversationHistoryForLLM, null, 2));
+
+
+
+
           // Create abort controller for this request
           abortController = new AbortController();
 
@@ -2266,7 +2246,10 @@
                   headers: {
                       'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ question }),
+                  body: JSON.stringify({
+                      question: question,
+                      history: conversationHistoryForLLM // Include the conversation history
+                  }),
                   signal: abortController.signal
               });
 
@@ -2288,11 +2271,9 @@
                   appendMessage('bot', answer);
                   showNotification('Response received successfully!', 'success');
               }
-
           } catch (error) {
               // Remove loading message
               loadingMessage.remove();
-
               if (error.name === 'AbortError') {
                   // Request was aborted
                   appendMessage('bot', '⏹️ **Generation Stopped**: Response generation was cancelled by user.');
@@ -2307,7 +2288,6 @@
               // Reset UI state
               isLoading = false;
               abortController = null;
-
               // Remove stop button and show send button
               const stopButton = document.getElementById('stopBtn');
               if (stopButton) {
@@ -2365,7 +2345,6 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-
           showNotification('Chat exported successfully!', 'success');
       }
 
@@ -2399,7 +2378,7 @@
 
               mediaRecorder.onstop = async () => {
                   const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                  
+
                   recordingStatusElement.style.display = 'flex';
                   recordingStatusElement.querySelector('span').textContent = 'Processing audio...';
                   recordingStatusElement.querySelector('i').className = 'fas fa-spinner fa-spin';
@@ -2445,7 +2424,6 @@
               recordingStatusElement.style.display = 'flex';
               recordingStatusElement.querySelector('span').textContent = 'Recording...';
               recordingStatusElement.querySelector('i').className = 'fas fa-microphone-alt';
-
           } catch (err) {
               console.error('Error accessing microphone:', err);
               showNotification('Could not access microphone. Please allow microphone access.', 'error');
@@ -2470,7 +2448,6 @@
           const notification = document.createElement('div');
           notification.className = `notification ${type}`;
           notification.textContent = message;
-
           container.appendChild(notification);
 
           // Show notification
